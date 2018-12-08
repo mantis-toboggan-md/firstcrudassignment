@@ -5,10 +5,10 @@ const cowsay = require('cowsay');
 var port = process.env.PORT || 8080;
 
 app.put('/create/:name/:email/:state', (req,res)=>{
-  let users = require('./storage.json')
+  let users = require(`${__dirname}/storage.json`)
   let id = 1;
   if(users.length){
-    id = users[users.length-1].id +1
+    id = (users[users.length-1].id +1)
   }
   let newUser = {
     id: id,
@@ -25,13 +25,13 @@ app.get('/', (req,res)=>{
   res.json(require('./storage.json'))
 })
 
-app.get('/:name', (req,res)=>{
-  let users = require('./storage.json');
-  res.json(users.filter((user)=>user.name==req.params.name))
+app.get('/:id', (req,res)=>{
+  let users = require(`${__dirname}/storage.json`);
+  res.json(users.filter((user)=>user.id==req.params.id))
 })
 
 app.put('/update/:id/:name/:email/:state', (req,res)=>{
-  let users = require('./storage.json')
+  let users = require(`${__dirname}/storage.json`)
   let newUser = {
     id: req.params.id,
     name: req.params.name,
@@ -44,12 +44,12 @@ app.put('/update/:id/:name/:email/:state', (req,res)=>{
     }
     return user;
   })
-  fs.writeFileSync(`${__dirname}/storage.json`, JSON.stringify(updatedUsers))
-  res.end(`Profile ${req.params.id} updated!`)
+  fs.writeFile(`${__dirname}/storage.json`, JSON.stringify(updatedUsers), (err, response)=>res.end(`Profile ${req.params.id} updated!`))
+//  setTimeout( ()=> res.end(`Profile ${req.params.id} updated!`), 1000)
 })
 
 app.delete('/:id', (req,res)=>{
-  let users = require('./storage.json')
+  let users = require(`${__dirname}/storage.json`)
   let updatedUsers = users.filter((user)=>user.id != req.params.id)
   fs.writeFileSync(`${__dirname}/storage.json`, JSON.stringify(updatedUsers))
   res.end(`Profile ${req.params.id} deleted!`)
@@ -66,3 +66,5 @@ app.listen(port, ()=>{
   f: 'turtle'
   }));
 })
+
+module.exports = app;
